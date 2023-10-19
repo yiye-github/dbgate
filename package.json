@@ -64,6 +64,7 @@
     "dbgate-serve": "node packages/dbgate/bin/dbgate-serve.js"
   },
   "dependencies": {
+    "ajv-keywords": "^3.5.2",
     "concurrently": "^5.1.0",
     "patch-package": "^6.2.1",
     "pino-pretty": "^9.1.1"
