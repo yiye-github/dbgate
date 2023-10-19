@@ -25,36 +25,36 @@
     //   icon: 'fa-table',
     //   name: 'table',
     // },
-    {
-      icon: 'icon file',
-      name: 'file',
-      title: 'Favorites & Saved files',
-    },
+    // {
+    //   icon: 'icon file',
+    //   name: 'file',
+    //   title: 'Favorites & Saved files',
+    // },
     {
       icon: 'icon history',
       name: 'history',
       title: 'Query history & Closed tabs',
     },
-    {
-      icon: 'icon archive',
-      name: 'archive',
-      title: 'Archive (saved tabular data)',
-    },
-    {
-      icon: 'icon plugin',
-      name: 'plugins',
-      title: 'Extensions & Plugins',
-    },
-    {
-      icon: 'icon cell-data',
-      name: 'cell-data',
-      title: 'Selected cell data detail view',
-    },
-    {
-      icon: 'icon app',
-      name: 'app',
-      title: 'Application layers',
-    },
+    // {
+    //   icon: 'icon archive',
+    //   name: 'archive',
+    //   title: 'Archive (saved tabular data)',
+    // },
+    // {
+    //   icon: 'icon plugin',
+    //   name: 'plugins',
+    //   title: 'Extensions & Plugins',
+    // },
+    // {
+    //   icon: 'icon cell-data',
+    //   name: 'cell-data',
+    //   title: 'Selected cell data detail view',
+    // },
+    // {
+    //   icon: 'icon app',
+    //   name: 'app',
+    //   title: 'Application layers',
+    // },
     // {
     //   icon: 'icon settings',
     //   name: 'settings',
