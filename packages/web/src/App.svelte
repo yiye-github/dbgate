@@ -36,8 +36,12 @@
 
       const config = await getConfig();
       await handleAuthOnStartup(config);
-
-      const connections = await apiCall('connections/list');
+      const urlParams = new URLSearchParams(window.location.search);
+      const accessToken = urlParams.get('access_token');
+      const resourceId = urlParams.get('resource_id');
+      localStorage.setItem('access_token', accessToken);
+      localStorage.setItem('resource_id', resourceId);
+      const connections = await apiCall('connections/list?access_token=' + accessToken + '&resource_id=' + resourceId);
       const settings = await getSettings();
       const apps = await getUsedApps();
       loadedApi = settings && connections && config && apps;

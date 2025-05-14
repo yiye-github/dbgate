@@ -25,36 +25,36 @@
     //   icon: 'fa-table',
     //   name: 'table',
     // },
-    {
-      icon: 'icon file',
-      name: 'file',
-      title: 'Favorites & Saved files',
-    },
+    // {
+    //   icon: 'icon file',
+    //   name: 'file',
+    //   title: 'Favorites & Saved files',
+    // },
     {
       icon: 'icon history',
       name: 'history',
       title: 'Query history & Closed tabs',
     },
-    {
-      icon: 'icon archive',
-      name: 'archive',
-      title: 'Archive (saved tabular data)',
-    },
-    {
-      icon: 'icon plugin',
-      name: 'plugins',
-      title: 'Extensions & Plugins',
-    },
-    {
-      icon: 'icon cell-data',
-      name: 'cell-data',
-      title: 'Selected cell data detail view',
-    },
-    {
-      icon: 'icon app',
-      name: 'app',
-      title: 'Application layers',
-    },
+    // {
+    //   icon: 'icon archive',
+    //   name: 'archive',
+    //   title: 'Archive (saved tabular data)',
+    // },
+    // {
+    //   icon: 'icon plugin',
+    //   name: 'plugins',
+    //   title: 'Extensions & Plugins',
+    // },
+    // {
+    //   icon: 'icon cell-data',
+    //   name: 'cell-data',
+    //   title: 'Selected cell data detail view',
+    // },
+    // {
+    //   icon: 'icon app',
+    //   name: 'app',
+    //   title: 'Application layers',
+    // },
     // {
     //   icon: 'icon settings',
     //   name: 'settings',
@@ -95,7 +95,10 @@
 <div class="main">
   {#if $visibleHamburgerMenuWidget}
     <div class="wrapper mb-3" on:click={handleMainMenu} bind:this={domMainMenu}>
-      <FontIcon icon="icon menu" />
+      <!-- <FontIcon icon="icon menu" /> -->
+      <div class="logo">
+        <img src="logo.svg" alt="">
+      </div>
     </div>
   {/if}
   {#each widgets.filter(x => hasPermission(`widgets/${x.name}`)) as item}
@@ -119,9 +122,9 @@
   >
     <FontIcon icon={$lockedDatabaseMode ? 'icon locked-database-mode' : 'icon unlocked-database-mode'} />
   </div>
-  <div class="wrapper" on:click={handleSettingsMenu} bind:this={domSettings}>
+  <!-- <div class="wrapper" on:click={handleSettingsMenu} bind:this={domSettings}>
     <FontIcon icon="icon settings" />
-  </div>
+  </div> -->
 </div>
 
 <style>
@@ -144,5 +147,13 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+  }
+  .logo {
+    width: 31px;
+    height: 31px;
+  }
+  .logo > img {
+    width: 100%;
+    height: 100%;
   }
 </style>

@@ -152,7 +152,7 @@ module.exports = {
 
   queryData_meta: true,
   async queryData({ conid, database, sql }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     logger.info({ conid, database, sql }, 'Processing query');
     const opened = await this.ensureOpened(conid, database);
     // if (opened && opened.status && opened.status.name == 'error') {
@@ -164,7 +164,7 @@ module.exports = {
 
   sqlSelect_meta: true,
   async sqlSelect({ conid, database, select }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const opened = await this.ensureOpened(conid, database);
     const res = await this.sendRequest(opened, { msgtype: 'sqlSelect', select });
     return res;
@@ -172,7 +172,7 @@ module.exports = {
 
   runScript_meta: true,
   async runScript({ conid, database, sql, useTransaction }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     logger.info({ conid, database, sql }, 'Processing script');
     const opened = await this.ensureOpened(conid, database);
     const res = await this.sendRequest(opened, { msgtype: 'runScript', sql, useTransaction });
@@ -181,14 +181,14 @@ module.exports = {
 
   collectionData_meta: true,
   async collectionData({ conid, database, options }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const opened = await this.ensureOpened(conid, database);
     const res = await this.sendRequest(opened, { msgtype: 'collectionData', options });
     return res.result || null;
   },
 
   async loadDataCore(msgtype, { conid, database, ...args }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const opened = await this.ensureOpened(conid, database);
     const res = await this.sendRequest(opened, { msgtype, ...args });
     if (res.errorMessage) {
@@ -203,37 +203,37 @@ module.exports = {
 
   loadKeys_meta: true,
   async loadKeys({ conid, database, root, filter }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.loadDataCore('loadKeys', { conid, database, root, filter });
   },
 
   exportKeys_meta: true,
   async exportKeys({ conid, database, options }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.loadDataCore('exportKeys', { conid, database, options });
   },
 
   loadKeyInfo_meta: true,
   async loadKeyInfo({ conid, database, key }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.loadDataCore('loadKeyInfo', { conid, database, key });
   },
 
   loadKeyTableRange_meta: true,
   async loadKeyTableRange({ conid, database, key, cursor, count }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.loadDataCore('loadKeyTableRange', { conid, database, key, cursor, count });
   },
 
   loadFieldValues_meta: true,
   async loadFieldValues({ conid, database, schemaName, pureName, field, search }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.loadDataCore('loadFieldValues', { conid, database, schemaName, pureName, field, search });
   },
 
   callMethod_meta: true,
   async callMethod({ conid, database, method, args }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.loadDataCore('callMethod', { conid, database, method, args });
 
     // const opened = await this.ensureOpened(conid, database);
@@ -246,7 +246,7 @@ module.exports = {
 
   updateCollection_meta: true,
   async updateCollection({ conid, database, changeSet }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const opened = await this.ensureOpened(conid, database);
     const res = await this.sendRequest(opened, { msgtype: 'updateCollection', changeSet });
     if (res.errorMessage) {
@@ -265,7 +265,7 @@ module.exports = {
         message: 'No connection',
       };
     }
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const existing = this.opened.find(x => x.conid == conid && x.database == database);
     if (existing) {
       return {
@@ -288,7 +288,7 @@ module.exports = {
 
   ping_meta: true,
   async ping({ conid, database }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     let existing = this.opened.find(x => x.conid == conid && x.database == database);
 
     if (existing) {
@@ -316,7 +316,7 @@ module.exports = {
 
   refresh_meta: true,
   async refresh({ conid, database, keepOpen }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     if (!keepOpen) this.close(conid, database);
 
     await this.ensureOpened(conid, database);
@@ -325,7 +325,7 @@ module.exports = {
 
   syncModel_meta: true,
   async syncModel({ conid, database, isFullRefresh }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const conn = await this.ensureOpened(conid, database);
     conn.subprocess.send({ msgtype: 'syncModel', isFullRefresh });
     return { status: 'ok' };
@@ -362,14 +362,14 @@ module.exports = {
 
   disconnect_meta: true,
   async disconnect({ conid, database }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     await this.close(conid, database, true);
     return { status: 'ok' };
   },
 
   structure_meta: true,
   async structure({ conid, database }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     if (conid == '__model') {
       const model = await importDbModel(database);
       return model;
@@ -390,7 +390,7 @@ module.exports = {
     if (!conid) {
       return null;
     }
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     if (!conid) return null;
     const opened = await this.ensureOpened(conid, database);
     return opened.serverVersion || null;
@@ -398,7 +398,7 @@ module.exports = {
 
   sqlPreview_meta: true,
   async sqlPreview({ conid, database, objects, options }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     // wait for structure
     await this.structure({ conid, database });
 
@@ -409,7 +409,7 @@ module.exports = {
 
   exportModel_meta: true,
   async exportModel({ conid, database }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const archiveFolder = await archive.getNewArchiveFolder({ database });
     await fs.mkdir(path.join(archivedir(), archiveFolder));
     const model = await this.structure({ conid, database });
@@ -420,7 +420,7 @@ module.exports = {
 
   generateDeploySql_meta: true,
   async generateDeploySql({ conid, database, archiveFolder }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const opened = await this.ensureOpened(conid, database);
     const res = await this.sendRequest(opened, {
       msgtype: 'generateDeploySql',

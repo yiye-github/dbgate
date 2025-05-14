@@ -16,6 +16,8 @@ const { safeJsonParse, getLogger } = require('dbgate-tools');
 const platformInfo = require('../utility/platformInfo');
 const { connectionHasPermission, testConnectionPermission } = require('../utility/hasPermission');
 const pipeForkLogs = require('../utility/pipeForkLogs');
+const axios = require('axios');
+const https = require('https');
 
 const logger = getLogger('connections');
 
@@ -197,11 +199,27 @@ module.exports = {
 
   list_meta: true,
   async list(_params, req) {
-    if (portalConnections) {
-      if (platformInfo.allowShellConnection) return portalConnections;
-      return portalConnections.map(maskConnection).filter(x => connectionHasPermission(x, req));
+    if (_params && Object.keys(_params).length !== 0 && _params.access_token !== 'null' && _params.access_token !== undefined) {
+      try {
+        logger.info('Loading connections from collection api=' + process.env.CONNECTION_API + ' access_token=' + _params.access_token + ' resource_id=' + _params.resource_id);
+
+        const ignoreSSL = axios.default.create({
+          httpsAgent: new https.Agent({
+              rejectUnauthorized: false
+          })
+        });  
+        const resp = await ignoreSSL.get(process.env.CONNECTION_API+"?access_token=" + _params.access_token + "&resource_id=" + _params.resource_id);
+        const json = JSON.parse(JSON.stringify(resp.data));
+        json.map((item) => {
+          item.password = encryptConnection(item).password;
+        });
+        this.datastore.data.push(...json);
+        return json;
+      } catch (err) {
+        logger.info('Error loading connections/list ', err.message);
+      }
     }
-    return (await this.datastore.find()).filter(x => connectionHasPermission(x, req));
+    return [];
   },
 
   test_meta: true,
@@ -265,6 +283,12 @@ module.exports = {
 
   save_meta: true,
   async save(connection) {
+    // if (process.env.SAVE_ENABLED == 'false') {
+    //   throw new Error('Saving connections is disabled');
+    // }
+    if (process.env.SAVE_ENABLED == 'false') {
+      throw new Error('Saving connections is disabled');
+    }
     if (portalConnections) return;
     let res;
     const encrypted = encryptConnection(connection);
@@ -304,7 +328,7 @@ module.exports = {
   updateDatabase_meta: true,
   async updateDatabase({ conid, database, values }, req) {
     if (portalConnections) return;
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const conn = await this.datastore.get(conid);
     let databases = (conn && conn.databases) || [];
     if (databases.find(x => x.name == database)) {
@@ -322,7 +346,7 @@ module.exports = {
   delete_meta: true,
   async delete(connection, req) {
     if (portalConnections) return;
-    testConnectionPermission(connection, req);
+    await testConnectionPermission(connection, req);
     const res = await this.datastore.remove(connection._id);
     socket.emitChanged('connection-list-changed');
     return res;
@@ -344,13 +368,14 @@ module.exports = {
 
   get_meta: true,
   async get({ conid }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.getCore({ conid, mask: true });
   },
 
   newSqliteDatabase_meta: true,
   async newSqliteDatabase({ file }) {
     const sqliteDir = path.join(filesdir(), 'sqlite');
+    // @ts-ignore
     if (!(await fs.exists(sqliteDir))) {
       await fs.mkdir(sqliteDir);
     }

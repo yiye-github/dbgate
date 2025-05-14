@@ -179,3 +179,10 @@ After restarting DbGate, you could use your new plugin from DbGate.
 
 ## Logging
 DbGate uses [pinomin logger](https://github.com/dbgate/pinomin). So by default, it produces JSON log messages into console and log files. If you want to see formatted logs, please use [pino-pretty](https://github.com/pinojs/pino-pretty) log formatter.
+
+
+**重要提示**
+nvm use 16.14
+yarn prepare:docker:uat
+cd docker 
+docker build -t ip:port/path/dbgate:1.0.1-test .
