@@ -1,5 +1,7 @@
 const { compilePermissions, testPermission } = require('dbgate-tools');
 const _ = require('lodash');
+const axios = require('axios');
+const https = require('https');
 
 const userPermissions = {};
 
@@ -70,10 +72,36 @@ function connectionHasPermission(connection, req) {
   }
 }
 
-function testConnectionPermission(connection, req) {
+async function testConnectionPermission(connection, req) {
   if (!connectionHasPermission(connection, req)) {
     throw new Error('Connection permission not granted');
   }
+
+  if (!await userLoginPermissions(connection, req)) {
+    throw new Error('Connection permission not granted');
+  }
+
+}
+
+async function userLoginPermissions(connection, req) {
+  if (!req) {
+    // request object not available, allow all
+    return true;
+  }
+  if (!connection) {
+    return true;
+  }
+  console.log(req);
+  const access_token = req.headers['x-access-token'];
+  const resource_id = req.headers['x-resource-id'];
+          const ignoreSSL = axios.default.create({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+          });  
+  const resp = await ignoreSSL.get(process.env.PERMISSIONS_API+"?access_token=" + access_token + "&resource_id=" + resource_id);
+  return resp.data;
+
 }
 
 module.exports = {

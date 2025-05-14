@@ -328,7 +328,7 @@ module.exports = {
   updateDatabase_meta: true,
   async updateDatabase({ conid, database, values }, req) {
     if (portalConnections) return;
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     const conn = await this.datastore.get(conid);
     let databases = (conn && conn.databases) || [];
     if (databases.find(x => x.name == database)) {
@@ -346,7 +346,7 @@ module.exports = {
   delete_meta: true,
   async delete(connection, req) {
     if (portalConnections) return;
-    testConnectionPermission(connection, req);
+    await testConnectionPermission(connection, req);
     const res = await this.datastore.remove(connection._id);
     socket.emitChanged('connection-list-changed');
     return res;
@@ -368,7 +368,7 @@ module.exports = {
 
   get_meta: true,
   async get({ conid }, req) {
-    testConnectionPermission(conid, req);
+    await testConnectionPermission(conid, req);
     return this.getCore({ conid, mask: true });
   },
 
